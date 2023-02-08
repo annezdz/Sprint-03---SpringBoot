@@ -1,4 +1,4 @@
-package br.com.uol.utils;
+package br.com.uol.exceptions;
 
 
 public class ResourceNotFoundException extends RuntimeException {

@@ -19,17 +19,15 @@ public class Location {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
-
+    private long id;
     @Column(unique = true)
     private String name;
-
     @Enumerated(EnumType.STRING)
     private RegionEnum region;
-    private long population;
+    private double population;
     private String capital;
 
-    private long area;
+    private double area;
 
     public Location(RegisterLocationDTO locationDTO) {
         this.name = locationDTO.name();

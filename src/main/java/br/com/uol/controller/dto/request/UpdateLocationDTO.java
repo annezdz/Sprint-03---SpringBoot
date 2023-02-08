@@ -6,9 +6,9 @@ import jakarta.validation.constraints.Positive;
 public record UpdateLocationDTO(
 
         @Positive
-        long population,
+        double population,
         @Positive
-        long area){
+        double area){
 
     public UpdateLocationDTO(Location location) {
         this(location.getPopulation(), location.getArea());

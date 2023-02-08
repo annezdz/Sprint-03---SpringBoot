@@ -5,9 +5,9 @@ import br.com.uol.controller.dto.request.UpdateLocationDTO;
 import br.com.uol.controller.dto.response.DetailedLocationDTO;
 import br.com.uol.entities.Location;
 import br.com.uol.entities.enums.RegionEnum;
+import br.com.uol.exceptions.*;
 import br.com.uol.repository.LocationRepository;
 import br.com.uol.utils.LocationUtils;
-import br.com.uol.utils.ResourceNotFoundException;
 import jakarta.transaction.Transactional;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -43,12 +43,12 @@ public class LocationController {
                 var uri = uriComponentsBuilder.path("/api/states/{id}").buildAndExpand(location.getId()).toUri();
                 return ResponseEntity.created(uri).body(new DetailedLocationDTO(location));
             } else {
-                throw new ResourceNotFoundException("Registro inválido. Verifique se os campos "
+                throw new BadRequestException("Registro inválido. Verifique se os campos "
                         + location.getName() + ", " + location.getCapital() + " e " + location.getRegion()
                         + " estão corretos.");
             }
         } catch (final DataIntegrityViolationException exception) {
-            throw new ResourceNotFoundException(locationDTO.name() + " duplicado.");
+            throw new SQLConstraintException(locationDTO.name() + " duplicado.");
         }
 
     }
@@ -65,7 +65,7 @@ public class LocationController {
         List<DetailedLocationDTO> locationList;
         Sort sort = Sort.by("region").descending().and(Sort.by("area").descending());
         if(region != null) {
-            locationList =  repository.findAllByRegion(RegionEnum.valueOf(String.valueOf(region.toUpperCase())), sort)
+            locationList =  repository.findAllByRegion(RegionEnum.valueOf(region.toUpperCase()), sort)
                     .stream()
                     .map(DetailedLocationDTO::new)
                     .collect(Collectors.toList());
