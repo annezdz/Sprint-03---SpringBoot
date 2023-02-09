@@ -1,0 +1,271 @@
+openapi: 3.0.1
+info:
+  title: API de Estados Brasileiros
+  version: 0.0.1
+  contact:
+    name: Anne Zimmermann
+    email: anne.zimmermann@compasso.com.br
+
+servers:
+  - url: http://localhost:8080
+    description: Porta padrão do banco H2
+paths:
+  /api/states/{id}:
+    get:
+      summary: Busca uma localização por ID
+      parameters:
+        - name: id
+          default: 1
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/LocationDTO'
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NotFound'
+    put:
+      summary: Atualiza uma localização
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            default: 1
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UpdateLocation'
+        required: true
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/LocationDTO'
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NotFound'
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BadRequest'
+
+    delete:
+      summary: Deleta uma localização
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+            format: int64
+            default: 1
+      responses:
+        "204":
+          description: No Content
+          content:
+            '*/*':
+              schema:
+                type: object
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NotFoundDelete'
+  /api/states:
+    get:
+      summary: Busca uma localização - Query Param = Região - Sul, Sudeste, Nordeste, Norte, Centro Oeste
+      parameters:
+        - name: region
+          in: query
+          required: false
+          schema:
+            type: string
+            default: "Nordeste"
+      responses:
+        "200":
+          description: OK
+          content:
+            '*/*':
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/LocationDTO'
+        "404":
+          description: Not Found
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/NotFoundDelete'
+    post:
+      summary: Cadastra uma nova localização
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterLocation'
+        required: true
+      responses:
+        "201":
+          description: Created
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/LocationDTO'
+        "422":
+          description: Unprocessable Entity
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/Unprocessable'
+        "400":
+          description: Bad Request
+          content:
+            '*/*':
+              schema:
+                $ref: '#/components/schemas/BadRequestPost'
+components:
+  schemas:
+    UpdateLocation:
+      type: object
+      properties:
+        population:
+          type: number
+          format: double
+        area:
+          type: number
+          format: double
+    LocationDTO:
+      type: object
+      properties:
+        id:
+          type: integer
+          format: int64
+        nome:
+          type: string
+        regiao:
+          type: string
+        populacao:
+          type: number
+          format: double
+        capital:
+          type: string
+        area:
+          type: number
+          format: double
+    RegisterLocation:
+      required:
+        - area
+        - capital
+        - nome
+        - populacao
+        - regiao
+      type: object
+      properties:
+        nome:
+          maxLength: 2147483647
+          minLength: 4
+          type: string
+          default: "Paraná"
+        regiao:
+          type: string
+          default: "Sul"
+        populacao:
+          type: number
+          format: double
+          default: "10.4"
+        capital:
+          type: string
+          default: "Curitiba"
+        area:
+          type: number
+          format: double
+          default: "199.315"
+    NotFound:
+      type: object
+      properties:
+        timestamp:
+          type: string
+          pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2})/
+          example: "2019-05-17"
+        status:
+          type: integer
+        error:
+          type: string
+        message:
+          type: string
+        path:
+          type: string
+    NotFoundDelete:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+        timestamp:
+          type: string
+          pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2})/
+          example: "2019-05-17"
+        message:
+          type: string
+        description:
+          type: string
+    BadRequest:
+      type: object
+      properties:
+        type:
+          type: string
+        title:
+          type: string
+        status:
+          type: integer
+        detail:
+          type: string
+        instance:
+          type: string
+    BadRequestPost:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+        timestamp:
+          type: string
+          pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2})/
+          example: "2019-05-17"
+        message:
+          type: string
+        description:
+          type: string
+    Unprocessable:
+      type: object
+      properties:
+        statusCode:
+          type: integer
+        timestamp:
+          type: string
+          pattern: /([0-9]{4})-(?:[0-9]{2})-([0-9]{2})/
+          example: "2019-05-17"
+        message:
+          type: string
+        description:
+          type: string
